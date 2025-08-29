@@ -1,0 +1,176 @@
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, FlatList, StyleSheet } from "react-native";
+
+export default function App() {
+  const [screen, setScreen] = useState("home");
+  const [score, setScore] = useState(0);
+
+  // Sample PYQ Data
+  const pyqs = [
+    { id: "1", q: "NEET: sin 90° ka maan kya hota hai?", ans: "1" },
+    { id: "2", q: "JEE: Derivative of x^2 ?", ans: "2x" },
+  ];
+
+  // Sample Quiz Data
+  const quiz = [
+    {
+      id: "1",
+      q: "What is 2 + 2 ?",
+      options: ["3", "4", "5"],
+      correct: "4",
+    },
+    {
+      id: "2",
+      q: "Value of cos 0° ?",
+      options: ["0", "1", "-1"],
+      correct: "1",
+    },
+  ];
+
+  // Poll Data
+  const [pollVotes, setPollVotes] = useState({ A: 0, B: 0 });
+
+  // Leaderboard Dummy Data
+  const leaderboard = [
+    { name: "Manish", score: 10 },
+    { name: "Rahul", score: 8 },
+    { name: "Priya", score: 7 },
+  ];
+
+  // Quiz Answer Check
+  const handleAnswer = (correct, option) => {
+    if (correct === option) {
+      setScore(score + 1);
+      alert("Correct ✅");
+    } else {
+      alert("Wrong ❌");
+    }
+  };
+
+  // Poll Voting
+  const vote = (option) => {
+    setPollVotes({ ...pollVotes, [option]: pollVotes[option] + 1 });
+  };
+
+  // Screens
+  if (screen === "home") {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>📘 Made by Manish Swami</Text>
+
+        <TouchableOpacity style={styles.btn} onPress={() => setScreen("pyq")}>
+          <Text style={styles.btnText}>📖 NEET/JEE PYQ</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.btn} onPress={() => setScreen("quiz")}>
+          <Text style={styles.btnText}>❓ Quiz</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.btn} onPress={() => setScreen("poll")}>
+          <Text style={styles.btnText}>📊 Poll</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.btn} onPress={() => setScreen("leaderboard")}>
+          <Text style={styles.btnText}>🏆 Leaderboard</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (screen === "pyq") {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>📖 PYQs</Text>
+        <FlatList
+          data={pyqs}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Text style={styles.text}>{item.q}</Text>
+              <Text style={styles.ans}>Answer: {item.ans}</Text>
+            </View>
+          )}
+        />
+        <TouchableOpacity style={styles.backBtn} onPress={() => setScreen("home")}>
+          <Text style={styles.btnText}>⬅ Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (screen === "quiz") {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>❓ Quiz</Text>
+        <Text style={styles.text}>Score: {score}</Text>
+        <FlatList
+          data={quiz}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Text style={styles.text}>{item.q}</Text>
+              {item.options.map((opt) => (
+                <TouchableOpacity
+                  key={opt}
+                  style={styles.btn}
+                  onPress={() => handleAnswer(item.correct, opt)}
+                >
+                  <Text style={styles.btnText}>{opt}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        />
+        <TouchableOpacity style={styles.backBtn} onPress={() => setScreen("home")}>
+          <Text style={styles.btnText}>⬅ Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (screen === "poll") {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>📊 Poll</Text>
+        <Text style={styles.text}>Which exam is tougher?</Text>
+        <TouchableOpacity style={styles.btn} onPress={() => vote("A")}>
+          <Text style={styles.btnText}>NEET ({pollVotes.A})</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={() => vote("B")}>
+          <Text style={styles.btnText}>JEE ({pollVotes.B})</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.backBtn} onPress={() => setScreen("home")}>
+          <Text style={styles.btnText}>⬅ Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (screen === "leaderboard") {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>🏆 Leaderboard</Text>
+        {leaderboard.map((item, index) => (
+          <Text key={index} style={styles.text}>
+            {index + 1}. {item.name} - {item.score}
+          </Text>
+        ))}
+        <TouchableOpacity style={styles.backBtn} onPress={() => setScreen("home")}>
+          <Text style={styles.btnText}>⬅ Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+}
+
+// Styles
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20, backgroundColor: "#f5f5f5" },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
+  btn: { backgroundColor: "#007bff", padding: 10, margin: 5, borderRadius: 10, width: 200, alignItems: "center" },
+  btnText: { color: "#fff", fontSize: 16 },
+  text: { fontSize: 18, marginBottom: 10 },
+  ans: { fontSize: 16, color: "green" },
+  card: { backgroundColor: "#fff", padding: 15, margin: 10, borderRadius: 10, elevation: 3, width: "100%" },
+  backBtn: { backgroundColor: "gray", padding: 10, marginTop: 20, borderRadius: 10, width: 200, alignItems: "center" },
+});
